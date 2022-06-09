@@ -755,6 +755,7 @@ class TroopView(View):
             data = {'message': "Fail"}
         return JsonResponse(data)
     
+#asd
 #flkdg
 class Query_WarPlayersView(View):
     
