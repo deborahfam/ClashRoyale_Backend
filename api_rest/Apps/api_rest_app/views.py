@@ -754,3 +754,16 @@ class TroopView(View):
         else:
             data = {'message': "Fail"}
         return JsonResponse(data)
+    
+class Query_WarPlayersView(View):
+    
+    @method_decorator(csrf_exempt)
+    def get(self,request,war_id):
+        # print(Is_War_Match.objects.filter(IWM_W_ID=war_id).values())
+        data1 = {'message': "Success"}
+        all=list(((Is_War_Match.objects.filter(IWM_M_ID__P2_ID__nickname__contains="")).filter(IWM_W_ID=war_id)).select_related('P2_ID').values())
+        all=list(Is_War_Match.objects.all().select_related('IWM_M_ID').values())
+        print(Is_War_Match.objects.filter(IWM_M_ID__P2_ID__nickname__contains="").filter(IWM_W_ID=war_id).select_related('P2_ID').values())
+        data = {'message': "Success", 'Consult': all}
+        return JsonResponse(data)
+        
