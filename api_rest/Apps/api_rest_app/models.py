@@ -7,11 +7,16 @@ class User(models.Model, forms.ModelForm):
     U_name = models.CharField(max_length=50)
     U_email = models.CharField(max_length=50)
     U_password = models.CharField(widget=forms.PasswordInput)
-    U_role = models.CharField(max_length=50)
+    U_role = models.ForeignKey(
+        'Roles',
+        on_delete=models.CASCADE,
+    )
     
 class Scopes(models.Model):
     SC_name = models.CharField(max_length=50)
-    
+
+class Roles(models.Model):
+    R_name = models.CharField(max_length=50)
 class User_Scopes(models.Model):
     SC_ID= models.ForeignKey(
         'Scopes',
@@ -19,6 +24,16 @@ class User_Scopes(models.Model):
     )
     U_ID= models.ForeignKey(
         'User',
+        on_delete=models.CASCADE,
+    )
+
+class Roles_Scopes(models.Model):
+    SC_ID= models.ForeignKey(
+        'Scopes',
+        on_delete=models.CASCADE,
+    )
+    R_ID= models.ForeignKey(
+        'Roles',
         on_delete=models.CASCADE,
     )
 
