@@ -756,6 +756,7 @@ class TroopView(View):
         return JsonResponse(data)
     
 #asd
+#flkdg
 class Query_WarPlayersView(View):
     
     @method_decorator(csrf_exempt)
