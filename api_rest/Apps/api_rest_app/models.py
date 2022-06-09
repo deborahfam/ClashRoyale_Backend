@@ -1,6 +1,31 @@
 from django.db import models
+from django import forms
 
 # Create your models here.
+
+class User(models.Model, forms.ModelForm):
+    U_name = models.CharField(max_length=50)
+    U_email = models.CharField(max_length=50)
+    U_password = models.CharField(widget=forms.PasswordInput)
+    U_role = models.CharField(max_length=50)
+    
+class Scopes(models.Model):
+    SC_name = models.CharField(max_length=50)
+    
+class User_Scopes(models.Model):
+    SC_ID= models.ForeignKey(
+        'Scopes',
+        on_delete=models.CASCADE,
+    )
+    U_ID= models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+    )
+
+class OAuth(models.Model):
+    OA_token = models.CharField(max_length=32)
+    OA_date = models.DateField()
+
 class War(models.Model):
     W_date = models.DateField()
     W_duedate = models.DateField()
