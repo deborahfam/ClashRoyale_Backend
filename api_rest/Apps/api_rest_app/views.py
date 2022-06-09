@@ -755,6 +755,7 @@ class TroopView(View):
             data = {'message': "Fail"}
         return JsonResponse(data)
     
+#asd
 class Query_WarPlayersView(View):
     
     @method_decorator(csrf_exempt)
