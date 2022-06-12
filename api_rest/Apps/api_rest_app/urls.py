@@ -33,5 +33,5 @@ urlpatterns = [
     path('structures/', StructureView.as_view()),
     path('structures/<int:id>', StructureView.as_view()),
     path('troops/', TroopView.as_view()),
-    path('troops/<int:id>', TroopView.as_view())
+    path('troops/<int:id>', TroopView.as_view()),
 ]
