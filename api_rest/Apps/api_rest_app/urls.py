@@ -2,8 +2,10 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('wars/', WarView.as_view()),
-    path('wars/<int:id>', WarView.as_view()),
+    # path('wars/', WarView.as_view()),
+    # path('wars/<int:id>', WarView.as_view()),
+    path('wars/', ListCreateWarAPIView.as_view()),
+    path('wars/<pk>', RetrieveUpdateDestroyWarAPIView.as_view()),
     path('guilds/', GuildView.as_view()),
     path('guilds/<int:id>', GuildView.as_view()),
     path('cards/', CardView.as_view()),
@@ -32,4 +34,6 @@ urlpatterns = [
     path('structures/<int:id>', StructureView.as_view()),
     path('troops/', TroopView.as_view()),
     path('troops/<int:id>', TroopView.as_view()),
+    path('challengesWinners/', challengesWinners.as_view()),
+    path('playersJoinClan/<id>', playersJoinClan.as_view())
 ]

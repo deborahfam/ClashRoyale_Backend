@@ -3,44 +3,6 @@ from django import forms
 
 # Create your models here.
 
-class User(models.Model):
-    U_name = models.CharField(max_length=50)
-    U_email = models.CharField(max_length=50)
-    U_password = models.CharField(max_length=50)
-    U_role = models.ForeignKey(
-        'Roles',
-        on_delete=models.CASCADE,
-    )
-    
-class Scopes(models.Model):
-    SC_name = models.CharField(max_length=50)
-
-class Roles(models.Model):
-    R_name = models.CharField(max_length=50)
-class User_Scopes(models.Model):
-    SC_ID= models.ForeignKey(
-        'Scopes',
-        on_delete=models.CASCADE,
-    )
-    U_ID= models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-    )
-
-class Roles_Scopes(models.Model):
-    SC_ID= models.ForeignKey(
-        'Scopes',
-        on_delete=models.CASCADE,
-    )
-    R_ID= models.ForeignKey(
-        'Roles',
-        on_delete=models.CASCADE,
-    )
-
-class OAuth(models.Model):
-    OA_token = models.CharField(max_length=32)
-    OA_date = models.DateField()
-
 class War(models.Model):
     W_date = models.DateField()
     W_duedate = models.DateField()
@@ -98,6 +60,9 @@ class Player(models.Model):
     P_trophies= models.IntegerField()
     trophiesMax= models.IntegerField()
     winCount= models.IntegerField()
+
+    def __str__(self):
+        return self.nickname
     
 class Is_War_Match(models.Model):
     IWM_W_ID= models.ForeignKey(
