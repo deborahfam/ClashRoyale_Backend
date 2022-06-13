@@ -912,17 +912,20 @@ class playersJoinClan(View):
     
     @method_decorator(csrf_exempt)    
     def get(self, request, id):        
-        player = list(Player.objects.filter(id=id).values())
+        player = Player.objects.get(id=id)
+        print(player.nickname)
         guilds = list(Guild.objects.values())
         guilds_matches = []
         if len(guilds)>0:
             for d in guilds:
-                if d.NeedTrophies <= player.P_trophies:
+                print(d)
+                if d['needTrophies'] <= player.P_trophies:
                     guilds_matches.append(d)
-            for gm in guilds_matches:
-                count = list(Player_Guild.objects.filter(id = gm.id).values().count())
-                if(count==50):
-                    guilds_matches.remove(gm)
+            # Si se aplica lo del maximo de jugadores
+            # for gm in guilds_matches:
+            #     count = list(Player_Guild.objects.filter(id = gm.id).values().count())
+            #     if(count==50):
+            #         guilds_matches.remove(gm)
             data = {'message': "Success", 'Guilds Matches': guilds_matches}   
         else:
             data = {'message': "Fail"}

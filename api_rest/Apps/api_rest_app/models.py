@@ -60,6 +60,9 @@ class Player(models.Model):
     P_trophies= models.IntegerField()
     trophiesMax= models.IntegerField()
     winCount= models.IntegerField()
+
+    def __str__(self):
+        return self.nickname
     
 class Is_War_Match(models.Model):
     IWM_W_ID= models.ForeignKey(
