@@ -3,7 +3,7 @@ from .views import *
 
 urlpatterns = [
     path('users/', ListCreateUserAPIView.as_view()),
-    path('users/<int:id>', RetrieveUpdateDestroyUserAPIView.as_view()),
+    path('users/<pk>', RetrieveUpdateDestroyUserAPIView.as_view()),
     path('scopesmanagements/', ScopesManagement.as_view()),
     path('scopesmanagements/<int:id>', ScopesManagement.as_view()),
     path('user_scopes/', User_Scopes.as_view()),

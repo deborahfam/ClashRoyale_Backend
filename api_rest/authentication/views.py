@@ -21,12 +21,16 @@ class ListCreateUserAPIView(ListCreateAPIView):
     # filter_backends = (filters.DjangoFilterBackend,)
     # filterset_class = MovieFilter
 
+    @method_decorator(csrf_exempt)
     def perform_create(self, serializer):
         serializer.save()
 
 class RetrieveUpdateDestroyUserAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = get_serializer(User)
     queryset = User.objects.all()
+    @method_decorator(csrf_exempt)
+    def __nada():
+        pass
     # permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 # class UserView(View):    
