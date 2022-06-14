@@ -25,6 +25,7 @@ class RetrieveUpdateDestroyUserAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUser]
 
 class LoginView(APIView):
+    permission_classes = []
     @method_decorator(csrf_exempt)  
     def post(self, request):
         username = request.data.get('username', None)
@@ -39,6 +40,7 @@ class LoginView(APIView):
             status=status.HTTP_404_NOT_FOUND)
 
 class LogoutView(APIView):
+    permission_classes = []
     @method_decorator(csrf_exempt)  
     def post(self, request):
         logout(request)
