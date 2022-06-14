@@ -10,6 +10,7 @@ import json
 from api_rest.pagination import CRPagination
 from api_rest.serializers import get_serializer
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
 # Create your views here.
@@ -201,6 +202,8 @@ class RetrieveUpdateDestroyTroopAPIView(RetrieveUpdateDestroyAPIView):
 #1. Conocer los mejores jugadores que participan en una guerra, es decir, por cada clan que
 #participa en una guerra obtener el jugador con más trofeos.
 class bestPlayersforClanView(APIView):
+    permission_classes=[IsAuthenticated]
+    
     @method_decorator(csrf_exempt)    
     def get(self, request, id):        
         war_matches = list(Is_War_Match.objects.filter(IWM_W_ID=id).values())
@@ -236,8 +239,9 @@ class bestPlayersforClanView(APIView):
 #por cada región obtener el clan con mayor cantidad de trofeos.
 
 class bestClanView(APIView):
-    @method_decorator(csrf_exempt)
+    permission_classes=[IsAuthenticated]
     
+    @method_decorator(csrf_exempt)
     def get(self, request):        
         guilds = list(Guild.objects.values())
         region_guilds = []
@@ -258,6 +262,7 @@ class bestClanView(APIView):
 
 #3. La carta o las cartas más donadas por región en el último mes.
 class mostDonatedCards(APIView):
+    permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
     def get(self, request):        
@@ -283,6 +288,7 @@ class mostDonatedCards(APIView):
 #conoce su carta favorita :)
 
 class mostFavoriteCards(APIView):
+    permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
     def get(self, request):        
@@ -332,6 +338,7 @@ class mostFavoriteCards(APIView):
 #5. Dado un jugador saber a qué clanes se puede unir, conociendo los requisitos de cada clan.
 
 class playersJoinClan(APIView):
+    permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
     def get(self, request, id):        
@@ -352,7 +359,8 @@ class playersJoinClan(APIView):
 #6. Los desafíos donde haya participado al menos un jugador que lo haya completado.
 
 class challengesWinners(APIView):
-    
+    permission_classes=[IsAuthenticated]
+
     @method_decorator(csrf_exempt)    
     def get(self, request):        
         challengeW = list(Player_Challenge.objects.values())
