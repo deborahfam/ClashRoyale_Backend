@@ -14,7 +14,6 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIV
 class ListCreateWarAPIView(ListCreateAPIView):
     serializer_class = get_serializer(War)
     queryset = War.objects.all()
-    # permission_classes = [IsAuthenticated]
     pagination_class = CRPagination
     # filter_backends = (filters.DjangoFilterBackend,)
     # filterset_class = MovieFilter
@@ -25,7 +24,6 @@ class ListCreateWarAPIView(ListCreateAPIView):
 class RetrieveUpdateDestroyWarAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = get_serializer(War)
     queryset = War.objects.all()
-    # permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 # Create your views here.
 # class WarView(View):
