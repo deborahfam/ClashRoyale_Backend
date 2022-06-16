@@ -1,3 +1,4 @@
+from requests import request
 from .models import *
 from api_rest.pagination import CRPagination
 from api_rest.serializers import get_serializer
@@ -9,15 +10,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
-# Create your views here.
 
+# Create your views here.
 class ListCreateUserAPIView(ListCreateAPIView):
     serializer_class = get_serializer(User)
     queryset = User.objects.all()
     permission_classes = [IsAdminUser]
     pagination_class = CRPagination
-    # filter_backends = (filters.DjangoFilterBackend,)
-    # filterset_class = MovieFilter
 
 class RetrieveUpdateDestroyUserAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = get_serializer(User)

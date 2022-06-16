@@ -34,6 +34,10 @@ urlpatterns = [
     path('structures/<pk>', RetrieveUpdateDestroyStructureAPIView.as_view()),
     path('troops/', ListCreateTroopAPIView.as_view()),
     path('troops/<pk>', RetrieveUpdateDestroyTroopAPIView.as_view()),
-    path('challengesWinners/', challengesWinners.as_view()),
-    path('playersJoinClan/<pk>', playersJoinClan.as_view())
+    path('challengesWinners', challengesWinners.as_view()),
+    path('playersJoinClan/<int:id>', playersJoinClan.as_view()),
+    path('mostFavoriteCards', mostFavoriteCards.as_view()),
+    path('mostDonatedCards', mostDonatedCards.as_view()),
+    path('bestClanView', bestClanView.as_view()),
+    path('bestPlayersforClanView/<int:id>', bestPlayersforClanView.as_view())
 ]

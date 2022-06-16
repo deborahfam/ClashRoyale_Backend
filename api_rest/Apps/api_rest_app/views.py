@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from .models import *
+from .serializers import *
 import json
 from api_rest.pagination import CRPagination
 from api_rest.serializers import get_serializer
@@ -14,6 +15,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
 # Create your views here.
+class ListCreatePlayerAPIView(ListCreateAPIView):
+    serializer_class = PlayerSerializer
+    queryset = Player.objects.all()
+    pagination_class = CRPagination
+    filterset_fields = '__all__'
+    search_fields = ['nickname']
+class RetrieveUpdateDestroyPlayerAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = PlayerSerializer
+    queryset = Player.objects.all()
+    filterset_fields = '__all__'
+    search_fields = ['nickname']
+
 class ListCreateWarAPIView(ListCreateAPIView):
     serializer_class = get_serializer(War)
     queryset = War.objects.all()
@@ -26,15 +39,16 @@ class RetrieveUpdateDestroyWarAPIView(RetrieveUpdateDestroyAPIView):
     filterset_fields = '__all__'
     search_fields = []
 
-
 class ListCreateGuildAPIView(ListCreateAPIView):
-    serializer_class = get_serializer(Guild)
+    serializer_class = GuildSerializer
+    # serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
     search_fields = []
 class RetrieveUpdateDestroyGuildAPIView(RetrieveUpdateDestroyAPIView):
-    serializer_class = get_serializer(Guild)
+    serializer_class = GuildSerializer
+    # serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
     filterset_fields = '__all__'
     search_fields = []
@@ -50,7 +64,6 @@ class RetrieveUpdateDestroyCardAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Card.objects.all()
     filterset_fields = '__all__'
     search_fields = []
-
 
 class ListCreateChallengeAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Challenge)
@@ -75,20 +88,7 @@ class RetrieveUpdateDestroyDonationAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Donation.objects.all()
     filterset_fields = '__all__'
     search_fields = []
-
     
-class ListCreatePlayerAPIView(ListCreateAPIView):
-    serializer_class = get_serializer(Player)
-    queryset = Player.objects.all()
-    pagination_class = CRPagination
-    filterset_fields = '__all__'
-    search_fields = []
-class RetrieveUpdateDestroyPlayerAPIView(RetrieveUpdateDestroyAPIView):
-    serializer_class = get_serializer(Player)
-    queryset = Player.objects.all()
-    filterset_fields = '__all__'
-    search_fields = []
-
 class ListCreateIs_War_MatchAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Is_War_Match)
     queryset = Is_War_Match.objects.all()
@@ -100,7 +100,6 @@ class RetrieveUpdateDestroyIs_War_MatchAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Is_War_Match.objects.all()
     filterset_fields = '__all__'
     search_fields = []
-
 
 class ListCreateMatchAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Match)
@@ -198,69 +197,100 @@ class RetrieveUpdateDestroyTroopAPIView(RetrieveUpdateDestroyAPIView):
     filterset_fields = '__all__'
     search_fields = []
 
-# 6 Consult
 #1. Conocer los mejores jugadores que participan en una guerra, es decir, por cada clan que
 #participa en una guerra obtener el jugador con más trofeos.
 class bestPlayersforClanView(APIView):
     permission_classes=[IsAuthenticated]
-    
+
     @method_decorator(csrf_exempt)    
     def get(self, request, id):        
         war_matches = list(Is_War_Match.objects.filter(IWM_W_ID=id).values())
         guild_players=[]
         if len(war_matches)>0:
             for wm in war_matches:
-                match = wm.IWM_M_ID
-                p1 = match.P1_ID
-                g1 = list(Player_Guild.objects.filter(PG_P_ID=p1).values())
-                p2 = match.P2_ID
-                g2 = list(Player_Guild.objects.filter(PG_P_ID=p2.values()))
+                match = Match.objects.get(id = wm['IWM_M_ID_id'])
+                p1 = Player.objects.get(id=match.P1_ID_id)
+                p2 = Player.objects.get(id=match.P2_ID_id)
+                exist1 = False
+                exist2 = False
                 
-                if guild_players.count>0:
-                    if(guild_players[0].ID == g1.PG_G_ID):
-                        if(guild_players[1] < g1.PG_P_IG.P_trophies):
-                            guild_players[1] = g1.PG_P_IG.P_trophies
-                    elif(guild_players[0].ID == g2.PG_G_ID):
-                        if(guild_players[1] < g2.PG_P_IG.P_trophies):
-                            guild_players[1] = g2.PG_P_IG.P_trophies
-                    else:
-                        guild_players.append(g1.PG_G_ID,g1.PG_P_ID)
-                        guild_players.append(g2.PG_G_ID,g2.PG_P_ID)
+                if(Player_Guild.objects.filter(PG_P_ID_id=p1.id).exists()):
+                    g1 = Player_Guild.objects.get(PG_P_ID_id=p1.id)
+                    exist1 = True
+                if(Player_Guild.objects.filter(PG_P_ID_id=p2.id).exists()):
+                    g2 = Player_Guild.objects.get(PG_P_ID_id=p2.id)
+                    exist2 = True
+                matcheo = False
+                if len(guild_players)>0:
+                    for gp in guild_players:
+                        print(gp)
+                        if(exist1 and gp[0].id == g1.PG_G_ID_id):
+                            matcheo = True
+                            if(gp[1].P_trophies < p1.P_trophies):
+                                gp[1] = p1
+                        elif(exist2 and gp[0].id == g2.PG_G_ID_id):
+                            matcheo = True
+                            if(gp[1] < p2.P_trophies):
+                                gp[1] = p2
+                    if matcheo == False:
+                        if(exist1):
+                            guild_players.append([g1.PG_G_ID, p1])
+                        if(exist2):    
+                            guild_players.append([g2.PG_G_ID, p2])
+                    matcheo = False
                 else:
-                    guild_players.append(g1.PG_G_ID,g1.PG_P_ID)
-                    guild_players.append(g2.PG_G_ID,g2.PG_P_ID)
-                    
-            data = {'message': "Success", 'War': guild_players}
+                    if(exist1):
+                        guild_players.append([g1.PG_G_ID,p1])
+                    if(exist2):
+                        guild_players.append([g2.PG_G_ID,p2])
+                result = []
+                for x in guild_players:
+                    print(x)
+                    result.append([x[0].G_name, x[1].nickname, x[1].P_trophies])
+            data = {'message': "Success", 'Guild': result}
         else:
             data = {'message': "Fail"}
         return JsonResponse(data)
 
 #2. Conocer el clan con mejor desempeño durante las guerras por región del mundo, es decir,
-#por cada región obtener el clan con mayor cantidad de trofeos.
+#por cada región obtener el clan con mayor cantidad de trofeos. WORKING
 
 class bestClanView(APIView):
     permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)
+    
     def get(self, request):        
         guilds = list(Guild.objects.values())
         region_guilds = []
+        match = False
         if len(guilds)>0:
-            for guild in guild:
-                if(region_guilds.count() > 0):
+            for guild in guilds:
+                if(len(region_guilds) > 0):
                     for x in region_guilds:
-                        if(x[0] == guild.region):
-                            x[1] = max(x[1].trophies, guild.trophies)
+                        print(x[0])
+                        print(guild['region'])
+                        print()
+                        if(x[0] == guild['region']):
+                            match=True
+                            if x[2]['trophies'] < guild['trophies']:
+                                x[2] = guild
+                                x[0] = guild['trophies']
+                            break
+                    if match==False:
+                        region_guilds.append([guild['trophies'],guild['region'], guild]) 
+                    match=False                           
                 else:
-                    region_guilds.append((guild.region, guild))
-                data = {'message': "Success", 'Best Guild By Region = Region + Guild ID': region_guilds}
+                    region_guilds.append([guild['trophies'],guild['region'], guild ])
+                region_guilds.sort(reverse=True)
+                data = {'message': "Success", 'Best Guild By Region Trophies': region_guilds[0][0], 'Region': region_guilds[0][1]}
             
         else:
             data = {'message': "Fail"}
         return JsonResponse(data)
 
 
-#3. La carta o las cartas más donadas por región en el último mes.
+#3. La carta o las cartas más donadas por región en el último mes. WORKING
 class mostDonatedCards(APIView):
     permission_classes=[IsAuthenticated]
     
@@ -268,24 +298,30 @@ class mostDonatedCards(APIView):
     def get(self, request):        
         donations = list(Donation.objects.values())
         card_count = []
+        match = False
         if len(donations)>0:
             for d in donations:
-                if card_count.count > 0:
-                    if(card_count[0]==d.card):
-                        d[1] = d[1]+1
-                    else:
-                        card_count.append([d.card,0])
+                card = Card.objects.get(id = (d)['D_C_ID_id'])
+                if len(card_count) > 0:
+                    for c in card_count:
+                        print(c)
+                        if(c[1] == card.id):
+                            c[0] = c[0]+1
+                            match = True
+                    if match == False:
+                        card_count.append([1,card.id])
+                    match = False
                 else:
-                    card_count.append([d.card,0])
-            card_count.sort(reverse=True)
-            data = {'message': "Success", 'Most Donated Card': card_count[0][0]}   
-            
+                    card_count.append([1,card.id])
+            card_count.sort()
+            returncard = Card.objects.get(id = card_count[card_count.count(1)-1][1])
+            data = {'message': "Success", 'Most Donated Card Name': returncard.C_name, 'ID': returncard.id}       
         else:
             data = {'message': "Fail"}
         return JsonResponse(data)
 
 #4. La carta más popular de cada tipo dentro de cada clan existente. Hint: de cada jugador se
-#conoce su carta favorita :)
+#conoce su carta favorita :) WORKING
 
 class mostFavoriteCards(APIView):
     permission_classes=[IsAuthenticated]
@@ -294,39 +330,46 @@ class mostFavoriteCards(APIView):
     def get(self, request):        
         players = list(Player.objects.values())
         players_card = []
-        if len(players)>0:
+        best = []
+        troop = False
+        spell = False
+        structure = False
+        troops = list(Troop.objects.values())
+        spells = list(Spell.objects.values())
+        structures = list(Structure.objects.values())
+        match = False
+        if len(players)>0:            
             for p in players:
-                if players_card.count > 0:
-                    if(players_card[1]==p.prefCard.C_name):
-                        p[2] = p[2]+1
-                    else:
-                        players_card.append([p.prefCard,p.prefCard.C_name,0])
+                if len(players_card)> 0:
+                    for pc in players_card:
+                        if(pc[1] == p['prefCard_id']):
+                            pc[0] = pc[0]+1
+                            match = True
+                    if match==False:
+                        players_card.append([1,p['prefCard_id']])
+                    match= False
                 else:
-                    players_card.append([p.prefCard,p.prefCard.C_name,0])
+                    players_card.append([1,p['prefCard_id']])
+            
             players_card.sort(reverse=True)
-            best = []
-            troop = False
-            spell = False
-            structure = False
-            troops = list(Troop.objects.values())
-            spells = list(Spell.objects.values())
-            structures = list(Structure.objects.values())
+            print(players_card)
+            
             for p in players_card:
                 if troop == False:
                     for t in troops:
-                        if t.id == p[0].id:
-                            best.append(['Troop',p[1]])
+                        if t['T_ID_id'] == p[1]:
+                            best.append(['Troop',(Card.objects.get(id=t['T_ID_id'])).C_name, 'Favorite of', p[0], 'players'])
                             troop = True
-                if spell == False:
+                elif spell == False:
                     for t in spells:
-                        if t.id == p[0].id:
-                            best.append(['Spell',p[1]])
+                        if t['SP_ID_id'] == p[1]:
+                            best.append(['Spell',(Card.objects.get(id=t['SP_ID_id'])).C_name,'Favorite of', p[0], 'players'])
                             spell = True
                             
-                if structure == False:
+                elif structure == False:
                     for t in structures:
-                        if t.id == p[0].id:
-                            best.append(['Structure',p[1]])
+                        if t['ST_ID_id'] == p[1]:
+                            best.append(['Structure',(Card.objects.get(id=t['ST_ID_id'])).C_name,'Favorite of', p[0], 'players'])
                             structure = True
                         
             data = {'message': "Success", 'Most Donated Cards by Type': best}   
@@ -335,7 +378,7 @@ class mostFavoriteCards(APIView):
             data = {'message': "Fail"}
         return JsonResponse(data)
 
-#5. Dado un jugador saber a qué clanes se puede unir, conociendo los requisitos de cada clan.
+#5. Dado un jugador saber a qué clanes se puede unir, conociendo los requisitos de cada clan. WORKING
 
 class playersJoinClan(APIView):
     permission_classes=[IsAuthenticated]
@@ -343,12 +386,10 @@ class playersJoinClan(APIView):
     @method_decorator(csrf_exempt)    
     def get(self, request, id):        
         player = Player.objects.get(id=id)
-        print(player.nickname)
         guilds = list(Guild.objects.values())
         guilds_matches = []
         if len(guilds)>0:
             for d in guilds:
-                print(d)
                 if d['needTrophies'] <= player.P_trophies:
                     guilds_matches.append(d)
             data = {'message': "Success", 'Guilds Matches': guilds_matches}   
@@ -356,17 +397,16 @@ class playersJoinClan(APIView):
             data = {'message': "Fail"}
         return JsonResponse(data)
 
-#6. Los desafíos donde haya participado al menos un jugador que lo haya completado.
+#6. Los desafíos donde haya participado al menos un jugador que lo haya completado. WORKING
 
 class challengesWinners(APIView):
     permission_classes=[IsAuthenticated]
-
+    
     @method_decorator(csrf_exempt)    
     def get(self, request):        
         challengeW = list(Player_Challenge.objects.values())
         if len(challengeW)>0:
-            data = {'message': "Success", 'Most Donated Card': challengeW}   
-            
+            data = {'message': "Success", 'Challenge': challengeW}            
         else:
-            data = {'message': "Fail"}
+            data = {'message': "There is not challenges to show"}
         return JsonResponse(data)
