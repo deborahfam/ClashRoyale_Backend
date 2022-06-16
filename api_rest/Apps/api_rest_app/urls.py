@@ -39,5 +39,6 @@ urlpatterns = [
     path('mostFavoriteCards', mostFavoriteCards.as_view()),
     path('mostDonatedCards', mostDonatedCards.as_view()),
     path('bestClanView', bestClanView.as_view()),
-    path('bestPlayersforClanView/<int:id>', bestPlayersforClanView.as_view())
+    path('bestPlayersforClanView/<int:id>', bestPlayersforClanView.as_view()),
+    path('dashboard', ListDashboardAPIView.as_view())
 ]

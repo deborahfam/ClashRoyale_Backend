@@ -5,16 +5,26 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from requests import Response
 from .models import *
 from .serializers import *
 import json
 from api_rest.pagination import CRPagination
 from api_rest.serializers import get_serializer
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
 
 # Create your views here.
+class ListDashboardAPIView(ListCreateAPIView):
+    serializer_class = DashboardSerializer
+    queryset = Dashboard.objects.all()
+    pagination_class = None
+
+    def post(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 class ListCreatePlayerAPIView(ListCreateAPIView):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
@@ -58,24 +68,24 @@ class ListCreateCardAPIView(ListCreateAPIView):
     queryset = Card.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['C_name']
 class RetrieveUpdateDestroyCardAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = CardSerializer
     queryset = Card.objects.all()
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['C_name']
 
 class ListCreateChallengeAPIView(ListCreateAPIView):
     serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['ch_name', 'ch_description']
 class RetrieveUpdateDestroyChallengeAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['ch_name', 'ch_description']
 
 class ListCreateDonationAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Donation)

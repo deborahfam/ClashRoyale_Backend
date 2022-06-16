@@ -1,16 +1,17 @@
 from msilib.schema import Class
+from requests import request
 from rest_framework import serializers
 from .models import *
 
 class PlayerSerializer(serializers.ModelSerializer):
 
-    guild = serializers.SerializerMethodField()
+    clan = serializers.SerializerMethodField()
     prefCardDetails = serializers.SerializerMethodField()
     participatedMatches = serializers.SerializerMethodField()
     ownedCards = serializers.SerializerMethodField()
     availableClans = serializers.SerializerMethodField()
 
-    def get_guild(self, obj : Player):
+    def get_clan(self, obj : Player):
         if type(self.instance)!=Player and len(self.instance)>2:
             return "Not queried"
         id=obj.id
@@ -262,76 +263,133 @@ class CardSerializer(serializers.ModelSerializer):
     topOwners = serializers.SerializerMethodField()
     topOwnersWhoPrefered = serializers.SerializerMethodField()
     timesOwned = serializers.SerializerMethodField()
-    timesOwnedAndPref = serializers.SerializerMethodField()
+    timesPrefered = serializers.SerializerMethodField()
 
     def get_topOwners(self, obj : Card):
         if type(self.instance)!=Card and len(self.instance)>2:
             return "Not queried"
         id=obj.id
-        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_G_ID_id__PC_C_ID_id=id).values())]
-        
-        participatingListVals.sort()
+        owners=[ Player.objects.filter(id=PC['PC_P_ID_id']).values('id','P_trophies')[0] for PC in list(Player_Card.objects.filter(PC_C_ID_id=id).values())]
 
-        topWinnersList = []
-        for i in range(0, min(len(participatingListVals),5)):
-            partipatingVal=participatingListVals[i]
-            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
-            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
-            topWinnersList.append(winner)
+        to_sort=[]
+        for owner in owners:
+            to_sort.append(owner['P_trophies']*(-1e10)-owner['id'])
 
-        return topWinnersList
+        to_sort.sort()
+
+        topOwnersList = []
+        for i in range(0, min(len(to_sort),5)):
+            ownerVal=to_sort[i]
+            winner = Player.objects.filter(id=(-ownerVal)%(int(1e10))).values()[0]
+            topOwnersList.append(winner)
+
+        return topOwnersList
 
     def get_topOwnersWhoPrefered(self, obj : Card):
         if type(self.instance)!=Card and len(self.instance)>2:
             return "Not queried"
         id=obj.id
-        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_C_ID=id).values())]
-        
-        participatingListVals.sort()
+        to_sort=[ player['P_trophies']*(-1e10)-player['id'] for player in list(Player.objects.filter(prefCard=id).values())]
 
-        topWinnersList = []
-        for i in range(0, min(len(participatingListVals),5)):
-            partipatingVal=participatingListVals[i]
-            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
-            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
-            topWinnersList.append(winner)
+        to_sort.sort()
 
-        return topWinnersList
+        topOwnersPrefList = []
+        for i in range(0, min(len(to_sort),5)):
+            ownerVal=to_sort[i]
+            winner = Player.objects.filter(id=(-ownerVal)%(int(1e10))).values()[0]
+            topOwnersPrefList.append(winner)
+
+        return topOwnersPrefList
     
     def get_timesOwned(self, obj : Card):
         if type(self.instance)!=Card and len(self.instance)>2:
             return "Not queried"
         id=obj.id
-        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_C_ID=id).values())]
-        
-        participatingListVals.sort()
-
-        topWinnersList = []
-        for i in range(0, min(len(participatingListVals),5)):
-            partipatingVal=participatingListVals[i]
-            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
-            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
-            topWinnersList.append(winner)
-
-        return topWinnersList
+        return len(list(Player_Card.objects.filter(PC_C_ID_id=id).values()))
     
-    def get_timesOwnedAndPref(self, obj : Card):
+    def get_timesPrefered(self, obj : Card):
         if type(self.instance)!=Card and len(self.instance)>2:
             return "Not queried"
         id=obj.id
-        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_C_ID=id).values())]
-        
-        participatingListVals.sort()
-
-        topWinnersList = []
-        for i in range(0, min(len(participatingListVals),5)):
-            partipatingVal=participatingListVals[i]
-            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
-            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
-            topWinnersList.append(winner)
-
-        return topWinnersList
+        return len(list(Player.objects.filter(prefCard=id).values()))
 
     class Meta:
         model=Card
         fields = '__all__'
+
+
+class DashboardSerializer(serializers.Serializer):
+    
+    popularCards = serializers.SerializerMethodField()
+    topClans = serializers.SerializerMethodField()
+    topPlayers = serializers.SerializerMethodField()
+
+    def get_popularCards(self, obj : Dashboard):
+        querySet=Card.objects.all()
+        request = self.context['request']
+
+        popCname=request.GET.get('popCname','')
+        popCdesc=request.GET.get('popCdesc','')
+        popCloc=request.GET.get('popCloc','')
+        popCqual=request.GET.get('popCqual','')
+
+        if popCname!='':
+            querySet=querySet.filter(C_name__contains=popCname).all()
+        if popCdesc!='':
+            querySet=querySet.filter(C_description__contains=popCdesc).all()
+        if popCloc!='':
+            querySet=querySet.filter(aviableLocation__contains=popCloc).all()
+        if popCqual!='':
+            querySet=querySet.filter(C_quality__contains=popCqual).all()
+        
+        freqs = dict()
+        for player in Player.objects.values():
+            id = player['prefCard_id']
+            if id not in freqs.keys():
+                freqs[id]=0
+            freqs[id]+=1
+
+        to_sort=[]
+        for id in freqs.keys():
+            to_sort.append(freqs[id]*(-1e10)-id)
+
+        to_sort.sort()
+
+        popularCardsList = []
+        for i in range(0, min(len(to_sort),5)):
+            cardVal=to_sort[i]
+            list = querySet.filter(id=(-cardVal)%(int(1e10))).values()
+            if len(list)>0:
+                winner = list[0]
+                winner['timesPrefered'] = int((-cardVal)/(1e10))
+                popularCardsList.append(winner)
+
+        return popularCardsList
+    
+    def get_topClans(self, obj : Dashboard):
+        querySet=Guild.objects.all()
+        request = self.context['request']
+
+        topGname=request.GET.get('topGname','')
+        topGdesc=request.GET.get('topGdesc','')
+        topGreg=request.GET.get('topGreg','')
+
+        if topGname!='':
+            querySet=querySet.filter(G_name__contains=topGname).all()
+        if topGdesc!='':
+            querySet=querySet.filter(G_description__contains=topGdesc).all()
+        if topGreg!='':
+            querySet=querySet.filter(region__contains=topGreg).all()
+        
+        return list(querySet.order_by('-trophies').values()[:5])
+    
+    def get_topPlayers(self, obj : Dashboard):
+        querySet=Player.objects.all()
+        request = self.context['request']
+
+        topPnick=request.GET.get('topPnick','')
+
+        if topPnick!='':
+            querySet=querySet.filter(nickname__contains=topPnick).all()
+        
+        return list(querySet.order_by('-P_trophies').values()[:5])
