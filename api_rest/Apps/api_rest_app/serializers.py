@@ -80,13 +80,10 @@ class GuildSerializer(serializers.ModelSerializer):
             return "Not queried"
         id=obj.id
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
-        if len(memberListId)>0:
-            memberList = []
-            for memberId in memberListId:
-                memberList.append(Player.objects.filter(id=memberId).values())
-            return memberList
-        else :
-            return []
+        memberList = []
+        for memberId in memberListId:
+            memberList.append(Player.objects.filter(id=memberId).values()[0])
+        return memberList
 
     def get_bestStructureCard(self, obj : Guild):
         if type(self.instance)!=Guild and len(self.instance)>2:
@@ -97,13 +94,12 @@ class GuildSerializer(serializers.ModelSerializer):
             return None
         memberList = []
         for memberId in memberListId:
-            memberList.append(Player.objects.filter(id=memberId).values())
+            memberList.append(Player.objects.filter(id=memberId).values()[0])
 
         freqs = dict()
         best_card = None
         best_freq = 0
         for member in memberList:
-            member=member[0]
             cardId = member['prefCard_id']
             if cardId not in freqs.keys():
                 freqs[cardId]=0
@@ -130,13 +126,12 @@ class GuildSerializer(serializers.ModelSerializer):
             return None
         memberList = []
         for memberId in memberListId:
-            memberList.append(Player.objects.filter(id=memberId).values())
+            memberList.append(Player.objects.filter(id=memberId).values()[0])
 
         freqs = dict()
         best_card = None
         best_freq = 0
         for member in memberList:
-            member=member[0]
             cardId = member['prefCard_id']
             if cardId not in freqs.keys():
                 freqs[cardId]=0
@@ -152,6 +147,7 @@ class GuildSerializer(serializers.ModelSerializer):
                 best_freq=freqs[cardId]
                 best_card=card[0]
 
+        best_card['timesPrefered']=freqs[best_card['id']]
         return best_card
 
     def get_bestSpellCard(self, obj : Guild):
@@ -163,13 +159,12 @@ class GuildSerializer(serializers.ModelSerializer):
             return None
         memberList = []
         for memberId in memberListId:
-            memberList.append(Player.objects.filter(id=memberId).values())
+            memberList.append(Player.objects.filter(id=memberId).values()[0])
 
         freqs = dict()
         best_card = None
         best_freq = 0
         for member in memberList:
-            member=member[0]
             cardId = member['prefCard_id']
             if cardId not in freqs.keys():
                 freqs[cardId]=0
@@ -185,6 +180,7 @@ class GuildSerializer(serializers.ModelSerializer):
                 best_freq=freqs[cardId]
                 best_card=card[0]
 
+        best_card['timesPrefered']=freqs[best_card['id']]
         return best_card
     
     def get_bestPlayers(self, obj : Guild):
@@ -205,11 +201,137 @@ class GuildSerializer(serializers.ModelSerializer):
         bestPlayers = []
         for i in range(0, min(len(to_sort), 5)):
             val=to_sort[i]
-            bestPlayers.append(Player.objects.filter(id=(-val)%(int(1e10))).values())
+            bestPlayers.append(Player.objects.filter(id=(-val)%(int(1e10))).values()[0])
         
         return bestPlayers
         
 
     class Meta:
         model=Guild
+        fields = '__all__'
+
+
+class WarSerializer(serializers.ModelSerializer):
+
+    participatingClans = serializers.SerializerMethodField()
+
+    def get_participatingClans(self, obj : War):
+        if type(self.instance)!=War and len(self.instance)>2:
+            return "Not queried"
+        id=obj.id
+        participatingListId=[ WG['P_G_ID_id'] for WG in list(Participate.objects.filter(P_W_ID=id).values())]
+        participatingList = []
+        for participatingId in participatingListId:
+            participatingList.append(Guild.objects.filter(id=participatingId).values()[0])
+
+        return participatingList
+
+    class Meta:
+        model=War
+        fields = '__all__'
+
+
+class ChallengeSerializer(serializers.ModelSerializer):
+
+    topWinners = serializers.SerializerMethodField()
+
+    def get_topWinners(self, obj : Challenge):
+        if type(self.instance)!=Challenge and len(self.instance)>2:
+            return "Not queried"
+        id=obj.id
+        participatingListVals=[ PCH['winCount']*(-1e10)-PCH['PCH_P_ID_id'] for PCH in list(Player_Challenge.objects.filter(PCH_CH_ID=id).values())]
+        
+        participatingListVals.sort()
+
+        topWinnersList = []
+        for i in range(0, min(len(participatingListVals),5)):
+            partipatingVal=participatingListVals[i]
+            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
+            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
+            topWinnersList.append(winner)
+
+        return topWinnersList
+
+    class Meta:
+        model=Challenge
+        fields = '__all__'
+
+
+class CardSerializer(serializers.ModelSerializer):
+
+    topOwners = serializers.SerializerMethodField()
+    topOwnersWhoPrefered = serializers.SerializerMethodField()
+    timesOwned = serializers.SerializerMethodField()
+    timesOwnedAndPref = serializers.SerializerMethodField()
+
+    def get_topOwners(self, obj : Card):
+        if type(self.instance)!=Card and len(self.instance)>2:
+            return "Not queried"
+        id=obj.id
+        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_G_ID_id__PC_C_ID_id=id).values())]
+        
+        participatingListVals.sort()
+
+        topWinnersList = []
+        for i in range(0, min(len(participatingListVals),5)):
+            partipatingVal=participatingListVals[i]
+            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
+            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
+            topWinnersList.append(winner)
+
+        return topWinnersList
+
+    def get_topOwnersWhoPrefered(self, obj : Card):
+        if type(self.instance)!=Card and len(self.instance)>2:
+            return "Not queried"
+        id=obj.id
+        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_C_ID=id).values())]
+        
+        participatingListVals.sort()
+
+        topWinnersList = []
+        for i in range(0, min(len(participatingListVals),5)):
+            partipatingVal=participatingListVals[i]
+            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
+            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
+            topWinnersList.append(winner)
+
+        return topWinnersList
+    
+    def get_timesOwned(self, obj : Card):
+        if type(self.instance)!=Card and len(self.instance)>2:
+            return "Not queried"
+        id=obj.id
+        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_C_ID=id).values())]
+        
+        participatingListVals.sort()
+
+        topWinnersList = []
+        for i in range(0, min(len(participatingListVals),5)):
+            partipatingVal=participatingListVals[i]
+            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
+            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
+            topWinnersList.append(winner)
+
+        return topWinnersList
+    
+    def get_timesOwnedAndPref(self, obj : Card):
+        if type(self.instance)!=Card and len(self.instance)>2:
+            return "Not queried"
+        id=obj.id
+        participatingListVals=[ PCH for PCH in list(Player.objects.filter(id__PC_C_ID=id).values())]
+        
+        participatingListVals.sort()
+
+        topWinnersList = []
+        for i in range(0, min(len(participatingListVals),5)):
+            partipatingVal=participatingListVals[i]
+            winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
+            winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
+            topWinnersList.append(winner)
+
+        return topWinnersList
+
+    class Meta:
+        model=Card
         fields = '__all__'

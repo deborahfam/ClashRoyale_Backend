@@ -8,7 +8,7 @@ urlpatterns = [
     path('wars/<pk>', RetrieveUpdateDestroyWarAPIView.as_view()),
     path('guilds/', ListCreateGuildAPIView.as_view()),
     path('guilds/<pk>', RetrieveUpdateDestroyGuildAPIView.as_view()),
-    path('cards/', ListCreateGuildAPIView.as_view()),
+    path('cards/', ListCreateCardAPIView.as_view()),
     path('cards/<pk>', RetrieveUpdateDestroyCardAPIView.as_view()),
     path('challenges/', ListCreateChallengeAPIView.as_view()),
     path('challenges/<pk>', RetrieveUpdateDestroyChallengeAPIView.as_view()),

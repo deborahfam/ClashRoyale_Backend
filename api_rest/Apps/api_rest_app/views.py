@@ -12,7 +12,7 @@ from api_rest.pagination import CRPagination
 from api_rest.serializers import get_serializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
 
 # Create your views here.
 class ListCreatePlayerAPIView(ListCreateAPIView):
@@ -28,16 +28,16 @@ class RetrieveUpdateDestroyPlayerAPIView(RetrieveUpdateDestroyAPIView):
     search_fields = ['nickname']
 
 class ListCreateWarAPIView(ListCreateAPIView):
-    serializer_class = get_serializer(War)
+    serializer_class = WarSerializer
     queryset = War.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['W_date']
 class RetrieveUpdateDestroyWarAPIView(RetrieveUpdateDestroyAPIView):
-    serializer_class = get_serializer(War)
+    serializer_class = WarSerializer
     queryset = War.objects.all()
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['W_date']
 
 class ListCreateGuildAPIView(ListCreateAPIView):
     serializer_class = GuildSerializer
@@ -45,34 +45,34 @@ class ListCreateGuildAPIView(ListCreateAPIView):
     queryset = Guild.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['G_name']
 class RetrieveUpdateDestroyGuildAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = GuildSerializer
     # serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
     filterset_fields = '__all__'
-    search_fields = []
+    search_fields = ['G_name']
 
 class ListCreateCardAPIView(ListCreateAPIView):
-    serializer_class = get_serializer(Card)
+    serializer_class = CardSerializer
     queryset = Card.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
     search_fields = []
 class RetrieveUpdateDestroyCardAPIView(RetrieveUpdateDestroyAPIView):
-    serializer_class = get_serializer(Card)
+    serializer_class = CardSerializer
     queryset = Card.objects.all()
     filterset_fields = '__all__'
     search_fields = []
 
 class ListCreateChallengeAPIView(ListCreateAPIView):
-    serializer_class = get_serializer(Challenge)
+    serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
     pagination_class = CRPagination
     filterset_fields = '__all__'
     search_fields = []
 class RetrieveUpdateDestroyChallengeAPIView(RetrieveUpdateDestroyAPIView):
-    serializer_class = get_serializer(Challenge)
+    serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
     filterset_fields = '__all__'
     search_fields = []
@@ -199,7 +199,7 @@ class RetrieveUpdateDestroyTroopAPIView(RetrieveUpdateDestroyAPIView):
 
 #1. Conocer los mejores jugadores que participan en una guerra, es decir, por cada clan que
 #participa en una guerra obtener el jugador con más trofeos.
-class bestPlayersforClanView(APIView):
+class bestPlayersforClanView(GenericAPIView):
     permission_classes=[IsAuthenticated]
 
     @method_decorator(csrf_exempt)    
@@ -255,11 +255,10 @@ class bestPlayersforClanView(APIView):
 #2. Conocer el clan con mejor desempeño durante las guerras por región del mundo, es decir,
 #por cada región obtener el clan con mayor cantidad de trofeos. WORKING
 
-class bestClanView(APIView):
+class bestClanView(GenericAPIView):
     permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)
-    
     def get(self, request):        
         guilds = list(Guild.objects.values())
         region_guilds = []
@@ -291,7 +290,7 @@ class bestClanView(APIView):
 
 
 #3. La carta o las cartas más donadas por región en el último mes. WORKING
-class mostDonatedCards(APIView):
+class mostDonatedCards(GenericAPIView):
     permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
@@ -323,7 +322,7 @@ class mostDonatedCards(APIView):
 #4. La carta más popular de cada tipo dentro de cada clan existente. Hint: de cada jugador se
 #conoce su carta favorita :) WORKING
 
-class mostFavoriteCards(APIView):
+class mostFavoriteCards(GenericAPIView):
     permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
@@ -380,7 +379,7 @@ class mostFavoriteCards(APIView):
 
 #5. Dado un jugador saber a qué clanes se puede unir, conociendo los requisitos de cada clan. WORKING
 
-class playersJoinClan(APIView):
+class playersJoinClan(GenericAPIView):
     permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
@@ -399,7 +398,7 @@ class playersJoinClan(APIView):
 
 #6. Los desafíos donde haya participado al menos un jugador que lo haya completado. WORKING
 
-class challengesWinners(APIView):
+class challengesWinners(GenericAPIView):
     permission_classes=[IsAuthenticated]
     
     @method_decorator(csrf_exempt)    
