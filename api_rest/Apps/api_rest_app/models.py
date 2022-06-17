@@ -164,3 +164,7 @@ class Troop(models.Model):
     T_lifePoints= models.IntegerField()
     T_areaDamage= models.IntegerField()
     T_unitCount= models.IntegerField()
+
+
+class Dashboard(models.Model):
+    pass
