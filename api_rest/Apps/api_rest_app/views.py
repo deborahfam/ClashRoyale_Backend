@@ -276,7 +276,6 @@ class mostFavoriteCards(ListCreateAPIView):
     permission_classes=[IsAuthenticated]
     serializer_class=CardSerializer
     pagination_class=CRPagination
-    filterset_fields = None
     
     def get_queryset(self):
         players = list(Player.objects.values())
