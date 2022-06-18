@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from socket import CAN_RAW_FD_FRAMES
 from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -78,6 +79,66 @@ class ListCreateChallengeAPIView(ListCreateAPIView):
     search_fields = ['ch_name', 'ch_description']
 class RetrieveUpdateDestroyChallengeAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = ChallengeSerializer
+    queryset = Challenge.objects.all()
+    filterset_fields = '__all__'
+    search_fields = ['ch_name', 'ch_description']
+
+class ListCreatesimple_PlayerAPIView(ListCreateAPIView):
+    serializer_class = get_serializer(Player)
+    queryset = Player.objects.all()
+    pagination_class = CRPagination
+    filterset_fields = '__all__'
+    search_fields = ['nickname']
+class RetrieveUpdateDestroysimple_PlayerAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = get_serializer(Player)
+    queryset = Player.objects.all()
+    filterset_fields = '__all__'
+    search_fields = ['nickname']
+
+class ListCreatesimple_WarAPIView(ListCreateAPIView):
+    serializer_class = get_serializer(War)
+    queryset = War.objects.all()
+    pagination_class = CRPagination
+    filterset_fields = '__all__'
+    search_fields = ['W_date']
+class RetrieveUpdateDestroysimple_WarAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = get_serializer(War)
+    queryset = War.objects.all()
+    filterset_fields = '__all__'
+    search_fields = ['W_date']
+
+class ListCreatesimple_GuildAPIView(ListCreateAPIView):
+    serializer_class = get_serializer(Guild)
+    queryset = Guild.objects.all()
+    pagination_class = CRPagination
+    filterset_fields = '__all__'
+    search_fields = ['G_name']
+class RetrieveUpdateDestroysimple_GuildAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = get_serializer(Guild)
+    queryset = Guild.objects.all()
+    filterset_fields = '__all__'
+    search_fields = ['G_name']
+
+class ListCreatesimple_CardAPIView(ListCreateAPIView):
+    serializer_class = get_serializer(Card)
+    queryset = Card.objects.all()
+    pagination_class = CRPagination
+    filterset_fields = '__all__'
+    search_fields = ['C_name']
+class RetrieveUpdateDestroysimple_CardAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = get_serializer(Card)
+    queryset = Card.objects.all()
+    filterset_fields = '__all__'
+    search_fields = ['C_name']
+
+class ListCreatesimple_ChallengeAPIView(ListCreateAPIView):
+    serializer_class = get_serializer(Challenge)
+    queryset = Challenge.objects.all()
+    pagination_class = CRPagination
+    filterset_fields = '__all__'
+    search_fields = ['ch_name', 'ch_description']
+class RetrieveUpdateDestroysimple_ChallengeAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = get_serializer(Challenge)
     queryset = Challenge.objects.all()
     filterset_fields = '__all__'
     search_fields = ['ch_name', 'ch_description']
