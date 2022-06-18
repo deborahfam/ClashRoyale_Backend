@@ -1,17 +1,11 @@
-from http.client import ImproperConnectionState
-from sre_constants import SUCCESS
 from django.http.response import JsonResponse
-from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views import View
 from requests import Response
 from .models import *
 from .serializers import *
-import json
 from api_rest.pagination import CRPagination
 from api_rest.serializers import get_serializer
-from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
@@ -218,12 +212,11 @@ class bestPlayersforClanView(ListCreateAPIView):
         id=self.kwargs['pk']   
         clansIds=[x['P_G_ID_id'] for x in Participate.objects.filter(P_W_ID_id=id).values()]
         playerIds=[]
-        players = []
+        players=[]
         for i in range(len(clansIds)):
             playerIds.append([x['PG_P_ID_id'] for x in Player_Guild.objects.filter(PG_G_ID_id=clansIds[i]).values() ])
             players.append(Player.objects.filter(id__in=playerIds[i]).order_by('-P_trophies').values()[0]['id'])
-        players = Player.objects.filter(id__in=players).all()
-        return players
+        return Player.objects.filter(id__in=players).all()
     
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -234,39 +227,23 @@ class bestPlayersforClanView(ListCreateAPIView):
 #2. Conocer el clan con mejor desempeño durante las guerras por región del mundo, es decir,
 #por cada región obtener el clan con mayor cantidad de trofeos. WORKING
 
-class bestClanView(GenericAPIView):
+class bestClanView(ListCreateAPIView):
     permission_classes=[IsAuthenticated]
+    serializer_class=GuildSerializer
+    pagination_class=CRPagination
     
-    @method_decorator(csrf_exempt)
-    def get(self, request):        
-        guilds = list(Guild.objects.values())
-        region_guilds = []
-        match = False
-        if len(guilds)>0:
-            for guild in guilds:
-                if(len(region_guilds) > 0):
-                    for x in region_guilds:
-                        print(x[0])
-                        print(guild['region'])
-                        print()
-                        if(x[0] == guild['region']):
-                            match=True
-                            if x[2]['trophies'] < guild['trophies']:
-                                x[2] = guild
-                                x[0] = guild['trophies']
-                            break
-                    if match==False:
-                        region_guilds.append([guild['trophies'],guild['region'], guild]) 
-                    match=False                           
-                else:
-                    region_guilds.append([guild['trophies'],guild['region'], guild ])
-                region_guilds.sort(reverse=True)
-                data = {'message': "Success", 'Best Guild By Region Trophies': region_guilds[0][0], 'Region': region_guilds[0][1]}
-            
-        else:
-            data = {'message': "Fail"}
-        return JsonResponse(data)
+    def get_queryset(self):
+        regions = set([ guild['region'] for guild in Guild.objects.values()])
+        bestGuildIds = []
+        for region in regions:
+            bestGuildIds.append(Guild.objects.filter(region=region).order_by('-trophies').values()[0]['id'])
+        return Guild.objects.filter(id__in=bestGuildIds).all()
+    
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 #3. La carta o las cartas más donadas por región en el último mes. WORKING
 class mostDonatedCards(GenericAPIView):
