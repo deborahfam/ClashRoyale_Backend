@@ -1,5 +1,6 @@
 from django.db import models
 from django import forms
+from datetime import date
 
 # Create your models here.
 
@@ -32,7 +33,6 @@ class Challenge(models.Model):
     ch_cost= models.IntegerField()
     ch_masPrices= models.IntegerField()
     
-
 class Donation(models.Model):
     D_P_ID= models.ForeignKey(
         'Player',
@@ -47,6 +47,7 @@ class Donation(models.Model):
         on_delete=models.CASCADE,
     )
     donationCount= models.IntegerField()
+    donationDate = models.DateField(default=date.today)
     
 class Player(models.Model):
     nickname= models.CharField(max_length=20)
@@ -89,7 +90,6 @@ class Match(models.Model):
     M_date= models.DateField()
     M_trophies= models.IntegerField()
 
-
 class Participate(models.Model):
     P_W_ID= models.ForeignKey(
         'War',
@@ -124,7 +124,6 @@ class Player_Challenge(models.Model):
         on_delete=models.CASCADE,
     )
     winCount= models.IntegerField()
-
 
 class Player_Guild(models.Model):
     PG_P_ID= models.ForeignKey(
@@ -164,7 +163,6 @@ class Troop(models.Model):
     T_lifePoints= models.IntegerField()
     T_areaDamage= models.IntegerField()
     T_unitCount= models.IntegerField()
-
 
 class Dashboard(models.Model):
     pass

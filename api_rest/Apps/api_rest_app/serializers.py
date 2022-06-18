@@ -406,3 +406,18 @@ class DashboardSerializer(serializers.Serializer):
             querySet=querySet.filter(nickname__contains=topPnick).all()
         
         return list(querySet.order_by('-P_trophies').values()[:5])
+
+class MostDonatedCardRegionSerializer(serializers.Serializer):
+
+    region = serializers.SerializerMethodField()
+    card = serializers.SerializerMethodField()
+
+    def get_region(self, obj : Donation):
+        return Guild.objects.filter(id=obj.D_G_ID_id).values()[0]['region']
+
+    def get_card(self, obj : Donation):
+        return Card.objects.filter(id=obj.D_C_ID_id).values()[0]
+
+    class Meta:
+        model=Donation
+        fields = []

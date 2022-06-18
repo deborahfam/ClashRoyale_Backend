@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -218,9 +219,6 @@ class bestPlayersforClanView(ListCreateAPIView):
             players.append(Player.objects.filter(id__in=playerIds[i]).order_by('-P_trophies').values()[0]['id'])
         return Player.objects.filter(id__in=players).all()
     
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -239,40 +237,37 @@ class bestClanView(ListCreateAPIView):
             bestGuildIds.append(Guild.objects.filter(region=region).order_by('-trophies').values()[0]['id'])
         return Guild.objects.filter(id__in=bestGuildIds).all()
     
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 #3. La carta o las cartas más donadas por región en el último mes. WORKING
-class mostDonatedCards(GenericAPIView):
+class mostDonatedCards(ListCreateAPIView):
     permission_classes=[IsAuthenticated]
+    serializer_class=MostDonatedCardRegionSerializer
+    pagination_class=CRPagination
     
-    @method_decorator(csrf_exempt)    
-    def get(self, request):        
-        donations = list(Donation.objects.values())
-        card_count = []
-        match = False
-        if len(donations)>0:
-            for d in donations:
-                card = Card.objects.get(id = (d)['D_C_ID_id'])
-                if len(card_count) > 0:
-                    for c in card_count:
-                        if(c[1] == card.id):
-                            c[0] = c[0]+1
-                            match = True
-                    if match == False:
-                        card_count.append([1,card.id])
-                    match = False
-                else:
-                    card_count.append([1,card.id])
-            card_count.sort()
-            returncard = Card.objects.get(id = card_count[card_count.count(1)-1][1])
-            data = {'message': "Success", 'Most Donated Card Name': returncard.C_name, 'ID': returncard.id}       
-        else:
-            data = {'message': "Fail"}
-        return JsonResponse(data)
+    def get_queryset(self):     
+        regions = set([ guild['region'] for guild in Guild.objects.values()])
+        donationIds=[]
+        for region in regions:
+            donations=Donation.objects.filter(D_G_ID__region=region).all()
+            freqs=dict()
+            bestCard=None
+            bestFreq=0
+            for donation in donations.values():
+                if (date.today()-donation['donationDate']).days>30:
+                    continue
+                if donation['D_C_ID_id'] not in freqs.keys():
+                    freqs[donation['D_C_ID_id']]=0
+                freqs[donation['D_C_ID_id']]+=donation['donationCount']
+                if freqs[donation['D_C_ID_id']]>bestFreq:
+                    bestCard=donation['D_C_ID_id']
+            if bestCard!=None:
+                donationIds.append(donations.filter(D_C_ID=bestCard).values()[0]['id'])
+        return Donation.objects.filter(id__in=donationIds).all()
+
+    def post(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 #4. La carta más popular de cada tipo dentro de cada clan existente. Hint: de cada jugador se
 #conoce su carta favorita :) WORKING
@@ -326,9 +321,6 @@ class mostFavoriteCards(ListCreateAPIView):
                         structure = True
         
         return Card.objects.filter(id__in=best).all()
-    
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -353,9 +345,6 @@ class playersJoinClan(ListCreateAPIView):
 
         guilds_matches=Guild.objects.filter(id__in=guilds_matches).values()
         return guilds_matches
-    
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -372,8 +361,5 @@ class challengesWinners(ListCreateAPIView):
         ids=[ PCH['PCH_CH_ID_id'] for PCH in Player_Challenge.objects.values()]
         return Challenge.objects.filter(id__in=ids).all()
     
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
