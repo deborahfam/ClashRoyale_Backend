@@ -1,5 +1,4 @@
 from datetime import datetime, date
-from socket import CAN_RAW_FD_FRAMES
 from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt

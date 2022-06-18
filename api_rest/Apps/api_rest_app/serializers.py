@@ -12,8 +12,6 @@ class PlayerSerializer(serializers.ModelSerializer):
     availableClans = serializers.SerializerMethodField()
 
     def get_clan(self, obj : Player):
-        if type(self.instance)!=Player and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         availables=list(Player_Guild.objects.filter(PG_P_ID=id).values())
         if len(availables)>0:
@@ -24,8 +22,6 @@ class PlayerSerializer(serializers.ModelSerializer):
             return None
 
     def get_prefCardDetails(self, obj : Player):
-        if type(self.instance)!=Player and len(self.instance)>2:
-            return "Not queried"
         id=int(obj.prefCard.id)
         availables=list(Card.objects.filter(id=id).values())
         if len(availables)>0:
@@ -34,22 +30,16 @@ class PlayerSerializer(serializers.ModelSerializer):
             return None
 
     def get_participatedMatches(self, obj : Player):
-        if type(self.instance)!=Player and len(self.instance)>2:
-            return "Not queried"
         id=int(obj.id)
         availables=list(Match.objects.filter(P1_ID_id=id).values())+list(Match.objects.filter(P2_ID_id=id).values())
         return availables
 
     def get_ownedCards(self, obj : Player):
-        if type(self.instance)!=Player and len(self.instance)>2:
-            return "Not queried"
         id=int(obj.id)
         availables=list(Player_Card.objects.filter(PC_P_ID_id=id).values())
         return availables
 
     def get_availableClans(self, obj : Player):
-        if type(self.instance)!=Player and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         availables=list(Player_Guild.objects.filter(PG_P_ID=id).values())
         if len(availables)>0:
@@ -77,8 +67,6 @@ class GuildSerializer(serializers.ModelSerializer):
     bestPlayers = serializers.SerializerMethodField()
 
     def get_members(self, obj : Guild):
-        if type(self.instance)!=Guild and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
         memberList = []
@@ -87,8 +75,6 @@ class GuildSerializer(serializers.ModelSerializer):
         return memberList
 
     def get_bestStructureCard(self, obj : Guild):
-        if type(self.instance)!=Guild and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
         if len(memberListId)==0:
@@ -119,8 +105,6 @@ class GuildSerializer(serializers.ModelSerializer):
         return best_card
         
     def get_bestTroopCard(self, obj : Guild):
-        if type(self.instance)!=Guild and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
         if len(memberListId)==0:
@@ -152,8 +136,6 @@ class GuildSerializer(serializers.ModelSerializer):
         return best_card
 
     def get_bestSpellCard(self, obj : Guild):
-        if type(self.instance)!=Guild and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
         if len(memberListId)==0:
@@ -185,8 +167,6 @@ class GuildSerializer(serializers.ModelSerializer):
         return best_card
     
     def get_bestPlayers(self, obj : Guild):
-        if type(self.instance)!=Guild and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
         if len(memberListId)==0:
@@ -217,8 +197,6 @@ class WarSerializer(serializers.ModelSerializer):
     participatingClans = serializers.SerializerMethodField()
 
     def get_participatingClans(self, obj : War):
-        if type(self.instance)!=War and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         participatingListId=[ WG['P_G_ID_id'] for WG in list(Participate.objects.filter(P_W_ID=id).values())]
         participatingList = []
@@ -237,8 +215,6 @@ class ChallengeSerializer(serializers.ModelSerializer):
     topWinners = serializers.SerializerMethodField()
 
     def get_topWinners(self, obj : Challenge):
-        if type(self.instance)!=Challenge and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         participatingListVals=[ PCH['winCount']*(-1e10)-PCH['PCH_P_ID_id'] for PCH in list(Player_Challenge.objects.filter(PCH_CH_ID=id).values())]
         
@@ -267,8 +243,6 @@ class CardSerializer(serializers.ModelSerializer):
     cardType = serializers.SerializerMethodField()
 
     def get_topOwners(self, obj : Card):
-        if type(self.instance)!=Card and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         owners=[ Player.objects.filter(id=PC['PC_P_ID_id']).values('id','P_trophies')[0] for PC in list(Player_Card.objects.filter(PC_C_ID_id=id).values())]
 
@@ -287,8 +261,6 @@ class CardSerializer(serializers.ModelSerializer):
         return topOwnersList
 
     def get_topOwnersWhoPrefered(self, obj : Card):
-        if type(self.instance)!=Card and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         to_sort=[ player['P_trophies']*(-1e10)-player['id'] for player in list(Player.objects.filter(prefCard=id).values())]
 
@@ -303,21 +275,14 @@ class CardSerializer(serializers.ModelSerializer):
         return topOwnersPrefList
     
     def get_timesOwned(self, obj : Card):
-        if type(self.instance)!=Card and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         return len(list(Player_Card.objects.filter(PC_C_ID_id=id).values()))
     
     def get_timesPrefered(self, obj : Card):
-        if type(self.instance)!=Card and len(self.instance)>2:
-            return "Not queried"
         id=obj.id
         return len(list(Player.objects.filter(prefCard=id).values()))
 
     def get_cardType(self, obj : Card):
-        if type(self.instance)!=Card and len(self.instance)>5:
-            return "Not queried"
-        print(obj.id)
         if len(list(Troop.objects.filter(T_ID_id=obj.id).all()))>0:
             return "Troop"
         if len(list(Spell.objects.filter(SP_ID_id=obj.id).all()))>0:
