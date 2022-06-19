@@ -49,6 +49,17 @@ class WarFilter(filters.FilterSet):
     class Meta:
         model = War
         fields = ['W_date','W_duedate']
+    
+    @property
+    def qs(self):
+        parent = super().qs
+        clanIds=self.request.GET.get('clanIds','')
+
+        if clanIds!='':
+            clanIds=[int(x) for x in clanIds.split(',')]
+            warIds=[ part['P_W_ID_id'] for part in Participate.objects.filter(P_G_ID__in=clanIds).values()]
+            parent=parent.filter(id__in=warIds).all()
+        return parent
 
 class ChallengeFilter(filters.FilterSet):
     ch_name= filters.CharFilter(lookup_expr='icontains')
