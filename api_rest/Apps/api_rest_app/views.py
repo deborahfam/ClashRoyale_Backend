@@ -68,6 +68,14 @@ class RetrieveUpdateDestroyAPIView500(RetrieveUpdateDestroyAPIView):
 
         return obj
 
+class ListRegionAPIView(ListCreateAPIView):
+    serializer_class = RegionSerializer
+    queryset = Dashboard.objects.all()
+    pagination_class = None
+
+    def post(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 class ListDashboardAPIView(ListCreateAPIView):
     serializer_class = DashboardSerializer
     queryset = Dashboard.objects.all()

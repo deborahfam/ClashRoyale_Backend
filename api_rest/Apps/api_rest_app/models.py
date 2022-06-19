@@ -19,7 +19,7 @@ class Guild(models.Model):
 class Card(models.Model):
     C_name= models.CharField(max_length=50)
     C_description  = models.TextField(max_length=1000)
-    aviableLocation = models.CharField(max_length=50)
+    avaliableLocation = models.CharField(max_length=50)
     C_quality =models.CharField(max_length=50) 
     elixirCount = models.IntegerField()
     initialLevel= models.IntegerField()

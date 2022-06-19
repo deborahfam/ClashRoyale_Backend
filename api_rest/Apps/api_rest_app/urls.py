@@ -42,11 +42,12 @@ urlpatterns = [
     path('structures/<pk>', RetrieveUpdateDestroyStructureAPIView.as_view()),
     path('troops/', ListCreateTroopAPIView.as_view()),
     path('troops/<pk>', RetrieveUpdateDestroyTroopAPIView.as_view()),
-    path('challenges_winners', challengesWinners.as_view()),
+    path('challenges_winners/', challengesWinners.as_view()),
     path('players_join_clan/<pk>', playersJoinClan.as_view()),
-    path('most_favorite_cards', mostFavoriteCards.as_view()),
-    path('most_donated_cards_by_region', mostDonatedCards.as_view()),
-    path('best_clan_by_region', bestClanView.as_view()),
+    path('most_favorite_cards/', mostFavoriteCards.as_view()),
+    path('most_donated_cards_by_region/', mostDonatedCards.as_view()),
+    path('best_clan_by_region/', bestClanView.as_view()),
     path('best_players_for_clan_at_war/<pk>', bestPlayersforClanView.as_view()),
-    path('dashboard', ListDashboardAPIView.as_view())
+    path('dashboard/', ListDashboardAPIView.as_view()),
+    path('regions/', ListRegionAPIView.as_view()),
 ]

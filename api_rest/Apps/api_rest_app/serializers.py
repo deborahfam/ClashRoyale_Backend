@@ -392,3 +392,16 @@ class MostDonatedCardRegionSerializer(serializers.Serializer):
     class Meta:
         model=Donation
         fields = []
+
+
+class RegionSerializer(serializers.Serializer):
+    
+    clanRegions = serializers.SerializerMethodField()
+    cardsAvaliableLocations = serializers.SerializerMethodField()
+
+    def get_clanRegions(self, obj : Dashboard):
+        return set([clan['region'] for clan in Guild.objects.values()])
+    
+    def get_cardsAvaliableLocations(self, obj : Dashboard):
+        return set([card['avaliableLocation'] for card in Card.objects.values()])
+
