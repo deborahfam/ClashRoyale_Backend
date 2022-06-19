@@ -101,7 +101,8 @@ class GuildSerializer(serializers.ModelSerializer):
             if freqs[cardId]>best_freq:
                 best_freq=freqs[cardId]
                 best_card=card[0]
-
+                
+        best_card['timesPrefered']=freqs[best_card['id']]
         return best_card
         
     def get_bestTroopCard(self, obj : Guild):
