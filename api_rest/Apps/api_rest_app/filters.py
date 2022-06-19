@@ -62,3 +62,13 @@ class ChallengeFilter(filters.FilterSet):
     class Meta:
         model = Challenge
         fields = ['ch_name','ch_description','ch_dueDate','ch_date', 'ch_minLevel', 'ch_cost', 'ch_masPrices']
+
+    @property
+    def qs(self):
+        parent = super().qs
+        completed=self.request.GET.get('completed','')
+
+        if completed=='true':
+            completedChIds=[ PCH['PCH_CH_ID_id'] for PCH in Player_Challenge.objects.values()]
+            parent=parent.filter(id__in=completedChIds).all()
+        return parent

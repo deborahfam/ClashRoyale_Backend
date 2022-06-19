@@ -71,7 +71,11 @@ class GuildSerializer(serializers.ModelSerializer):
         memberListId=[ PG['PG_P_ID_id'] for PG in list(Player_Guild.objects.filter(PG_G_ID=id).values())]
         memberList = []
         for memberId in memberListId:
-            memberList.append(Player.objects.filter(id=memberId).values()[0])
+            player=Player.objects.filter(id=memberId).values()[0]
+            prefCard=player['prefCard_id']
+            player.__delitem__('prefCard_id')
+            player['prefCard']=prefCard
+            memberList.append(player)
         return memberList
 
     def get_bestStructureCard(self, obj : Guild):
@@ -101,7 +105,7 @@ class GuildSerializer(serializers.ModelSerializer):
             if freqs[cardId]>best_freq:
                 best_freq=freqs[cardId]
                 best_card=card[0]
-                
+
         best_card['timesPrefered']=freqs[best_card['id']]
         return best_card
         
