@@ -33,7 +33,7 @@ class LoginView(APIView):
 
         if user:
             login(request, user)
-            return Response(status=status.HTTP_200_OK, data={'user': User.objects.filter(username=username).values()})
+            return Response(status=status.HTTP_200_OK, data={'profile': User.objects.filter(username=username).values()[0]})
 
         return Response(
             status=status.HTTP_404_NOT_FOUND)

@@ -42,12 +42,19 @@ class CardFilter(filters.FilterSet):
         model = Card
         fields = ['C_name','C_description','aviableLocation','C_quality', 'elixirCount', 'initialLevel']
 
-        
+class WarFilter(filters.FilterSet):
+    W_date= filters.DateFromToRangeFilter()
+    W_duedate= filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = War
+        fields = ['W_date','W_duedate']
+
 class ChallengeFilter(filters.FilterSet):
     ch_name= filters.CharFilter(lookup_expr='icontains')
     ch_description= filters.CharFilter(lookup_expr='icontains')
-    ch_dueDate= filters.DateFilter()
-    ch_date= filters.DateFilter()
+    ch_dueDate= filters.DateFromToRangeFilter()
+    ch_date= filters.DateFromToRangeFilter()
     ch_minLevel= filters.NumberFilter()
     ch_cost= filters.NumberFilter()
     ch_masPrices=filters.NumberFilter()

@@ -92,12 +92,12 @@ class ListCreateWarAPIView(ListCreateAPIView):
     serializer_class = WarSerializer
     queryset = War.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = WarFilter
     search_fields = ['W_date']
 class RetrieveUpdateDestroyWarAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = WarSerializer
     queryset = War.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = WarFilter
     search_fields = ['W_date']
 
 class ListCreateGuildAPIView(ListCreateAPIView):
@@ -152,12 +152,12 @@ class ListCreatesimple_WarAPIView(ListCreateAPIView):
     serializer_class = get_serializer(War)
     queryset = War.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = WarFilter
     search_fields = ['W_date']
 class RetrieveUpdateDestroysimple_WarAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = get_serializer(War)
     queryset = War.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = WarFilter
     search_fields = ['W_date']
 
 class ListCreatesimple_GuildAPIView(ListCreateAPIView):
