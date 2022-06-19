@@ -1,0 +1,57 @@
+from dataclasses import fields
+from pyexpat import model
+from warnings import filters
+from .models import *
+from django_filters import rest_framework as filters
+
+class PlayerFilter(filters.FilterSet):
+    nickname= filters.CharFilter(lookup_expr='icontains')
+    prefCard= filters.NumberFilter()
+    P_gold= filters.NumberFilter()
+    P_gems= filters.NumberFilter()
+    P_level= filters.NumberFilter()
+    P_trophies= filters.NumberFilter()
+    trophiesMax= filters.NumberFilter()
+    winCount= filters.NumberFilter()
+
+    class Meta:
+        model = Player
+        fields = ['nickname','prefCard','P_gold','P_gems', 'P_level', 'P_trophies', 'trophiesMax', 'winCount']
+
+class GuildFilter(filters.FilterSet):
+    G_name= filters.CharFilter(lookup_expr='icontains')
+    G_type= filters.CharFilter(lookup_expr='icontains')
+    G_description= filters.CharFilter(lookup_expr='icontains')
+    region= filters.CharFilter(lookup_expr='icontains')
+    trophies= filters.NumberFilter()
+    needTrophies= filters.NumberFilter()
+
+    class Meta:
+        model = Guild
+        fields = ['G_name','G_type','G_description','region', 'trophies', 'needTrophies']
+        
+class CardFilter(filters.FilterSet):
+    C_name= filters.CharFilter(lookup_expr='icontains')
+    C_description= filters.CharFilter(lookup_expr='icontains')
+    aviableLocation= filters.CharFilter(lookup_expr='icontains')
+    C_quality= filters.CharFilter(lookup_expr='icontains')
+    elixirCount= filters.NumberFilter()
+    initialLevel= filters.NumberFilter()
+
+    class Meta:
+        model = Card
+        fields = ['C_name','C_description','aviableLocation','C_quality', 'elixirCount', 'initialLevel']
+
+        
+class ChallengeFilter(filters.FilterSet):
+    ch_name= filters.CharFilter(lookup_expr='icontains')
+    ch_description= filters.CharFilter(lookup_expr='icontains')
+    ch_dueDate= filters.DateFilter()
+    ch_date= filters.DateFilter()
+    ch_minLevel= filters.NumberFilter()
+    ch_cost= filters.NumberFilter()
+    ch_masPrices=filters.NumberFilter()
+
+    class Meta:
+        model = Challenge
+        fields = ['ch_name','ch_description','ch_dueDate','ch_date', 'ch_minLevel', 'ch_cost', 'ch_masPrices']

@@ -23,6 +23,9 @@ class Card(models.Model):
     C_quality =models.CharField(max_length=50) 
     elixirCount = models.IntegerField()
     initialLevel= models.IntegerField()
+
+    def __str__(self):
+        return self.C_name
     
 class Challenge(models.Model):
     ch_name= models.CharField(max_length=50)

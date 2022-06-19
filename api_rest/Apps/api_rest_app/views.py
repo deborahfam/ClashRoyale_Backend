@@ -11,6 +11,7 @@ from api_rest.serializers import get_serializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
+from .filters import *
 
 # Create your views here.
 def get_object_or_500(klass, *args, **kwargs):
@@ -36,7 +37,7 @@ def get_object_or_500(klass, *args, **kwargs):
     try:
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
-        raise Exception('No objects matches this query')
+        raise Exception('No object matches this query')
 
 class RetrieveUpdateDestroyAPIView500(RetrieveUpdateDestroyAPIView):
     def get_object(self):
@@ -79,12 +80,12 @@ class ListCreatePlayerAPIView(ListCreateAPIView):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = PlayerFilter
     search_fields = ['nickname']
 class RetrieveUpdateDestroyPlayerAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = PlayerFilter
     search_fields = ['nickname']
 
 class ListCreateWarAPIView(ListCreateAPIView):
@@ -101,52 +102,50 @@ class RetrieveUpdateDestroyWarAPIView(RetrieveUpdateDestroyAPIView500):
 
 class ListCreateGuildAPIView(ListCreateAPIView):
     serializer_class = GuildSerializer
-    # serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = GuildFilter
     search_fields = ['G_name']
 class RetrieveUpdateDestroyGuildAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = GuildSerializer
-    # serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = GuildFilter
     search_fields = ['G_name']
 
 class ListCreateCardAPIView(ListCreateAPIView):
     serializer_class = CardSerializer
     queryset = Card.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = CardFilter
     search_fields = ['C_name']
 class RetrieveUpdateDestroyCardAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = CardSerializer
     queryset = Card.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = CardFilter
     search_fields = ['C_name']
 
 class ListCreateChallengeAPIView(ListCreateAPIView):
     serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = ChallengeFilter
     search_fields = ['ch_name', 'ch_description']
 class RetrieveUpdateDestroyChallengeAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = ChallengeSerializer
     queryset = Challenge.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = ChallengeFilter
     search_fields = ['ch_name', 'ch_description']
 
 class ListCreatesimple_PlayerAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Player)
     queryset = Player.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = PlayerFilter
     search_fields = ['nickname']
 class RetrieveUpdateDestroysimple_PlayerAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = get_serializer(Player)
     queryset = Player.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = PlayerFilter
     search_fields = ['nickname']
 
 class ListCreatesimple_WarAPIView(ListCreateAPIView):
@@ -165,36 +164,36 @@ class ListCreatesimple_GuildAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = GuildFilter
     search_fields = ['G_name']
 class RetrieveUpdateDestroysimple_GuildAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = get_serializer(Guild)
     queryset = Guild.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = GuildFilter
     search_fields = ['G_name']
 
 class ListCreatesimple_CardAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Card)
     queryset = Card.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = CardFilter
     search_fields = ['C_name']
 class RetrieveUpdateDestroysimple_CardAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = get_serializer(Card)
     queryset = Card.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = CardFilter
     search_fields = ['C_name']
 
 class ListCreatesimple_ChallengeAPIView(ListCreateAPIView):
     serializer_class = get_serializer(Challenge)
     queryset = Challenge.objects.all()
     pagination_class = CRPagination
-    filterset_fields = '__all__'
+    filterset_class = ChallengeFilter
     search_fields = ['ch_name', 'ch_description']
 class RetrieveUpdateDestroysimple_ChallengeAPIView(RetrieveUpdateDestroyAPIView500):
     serializer_class = get_serializer(Challenge)
     queryset = Challenge.objects.all()
-    filterset_fields = '__all__'
+    filterset_class = ChallengeFilter
     search_fields = ['ch_name', 'ch_description']
 
 class ListCreateDonationAPIView(ListCreateAPIView):

@@ -89,11 +89,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', 
-    'rest_framework.filters.OrderingFilter', 
-    'rest_framework.filters.SearchFilter']
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend', 
+        'rest_framework.filters.OrderingFilter', 
+        'rest_framework.filters.SearchFilter']
 }
 
+
+# FILTERS_DEFAULT_LOOKUP_EXPR='icontains'
 WSGI_APPLICATION = 'api_rest.wsgi.application'
 
 

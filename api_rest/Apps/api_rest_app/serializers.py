@@ -43,7 +43,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         id=obj.id
         availables=list(Player_Guild.objects.filter(PG_P_ID=id).values())
         if len(availables)>0:
-            return "Already belongs to a clan"
+            return []
         else :
             guilds = list(Guild.objects.values())
             guilds_matches = []
@@ -371,6 +371,7 @@ class DashboardSerializer(serializers.Serializer):
             querySet=querySet.filter(nickname__contains=topPnick).all()
         
         return list(querySet.order_by('-P_trophies').values()[:5])
+
 
 class MostDonatedCardRegionSerializer(serializers.Serializer):
 
