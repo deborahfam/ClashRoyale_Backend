@@ -7,29 +7,40 @@ from django_filters import rest_framework as filters
 class PlayerFilter(filters.FilterSet):
     nickname= filters.CharFilter(lookup_expr='icontains')
     prefCard= filters.NumberFilter()
-    P_gold= filters.NumberFilter()
+    P_gold= filters.RangeFilter()
     P_gems= filters.NumberFilter()
     P_level= filters.NumberFilter()
-    P_trophies= filters.NumberFilter()
+    P_trophies= filters.RangeFilter()
     trophiesMax= filters.NumberFilter()
     winCount= filters.NumberFilter()
 
     class Meta:
         model = Player
         fields = ['nickname','prefCard','P_gold','P_gems', 'P_level', 'P_trophies', 'trophiesMax', 'winCount']
+    
+    @property
+    def qs(self):
+        parent = super().qs
+        clanId=self.request.GET.get('clanId','')
+
+        if clanId!='':
+            clanId=int(clanId)
+            playerIds=[ part['PG_P_ID_id'] for part in Player_Guild.objects.filter(PG_G_ID=clanId).values()]
+            parent=parent.filter(id__in=playerIds).all()
+        return parent
 
 class GuildFilter(filters.FilterSet):
     G_name= filters.CharFilter(lookup_expr='icontains')
     G_type= filters.CharFilter(lookup_expr='icontains')
     G_description= filters.CharFilter(lookup_expr='icontains')
     region= filters.CharFilter(lookup_expr='icontains')
-    trophies= filters.NumberFilter()
+    trophies= filters.RangeFilter()
     needTrophies= filters.NumberFilter()
 
     class Meta:
         model = Guild
         fields = ['G_name','G_type','G_description','region', 'trophies', 'needTrophies']
-        
+
 class CardFilter(filters.FilterSet):
     C_name= filters.CharFilter(lookup_expr='icontains')
     C_description= filters.CharFilter(lookup_expr='icontains')
