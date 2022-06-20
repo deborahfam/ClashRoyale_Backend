@@ -34,7 +34,7 @@ class Challenge(models.Model):
     ch_date= models.DateField()
     ch_minLevel= models.IntegerField()
     ch_cost= models.IntegerField()
-    ch_masPrices= models.IntegerField()
+    ch_maxPrices= models.IntegerField()
     
 class Donation(models.Model):
     D_P_ID= models.ForeignKey(
