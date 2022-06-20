@@ -218,6 +218,7 @@ class WarSerializer(serializers.ModelSerializer):
 class ChallengeSerializer(serializers.ModelSerializer):
 
     topWinners = serializers.SerializerMethodField()
+    completed = serializers.SerializerMethodField()
 
     def get_topWinners(self, obj : Challenge):
         id=obj.id
@@ -230,9 +231,15 @@ class ChallengeSerializer(serializers.ModelSerializer):
             partipatingVal=participatingListVals[i]
             winner = Player.objects.filter(id=(-partipatingVal)%(int(1e10))).values()[0]
             winner['challengeWinCount'] = int((-partipatingVal)/(int(1e10)))
+            prefCard=winner['prefCard_id']
+            winner.__delitem__('prefCard_id')
+            winner['prefCard']=prefCard
             topWinnersList.append(winner)
 
         return topWinnersList
+
+    def get_completed(self, obj : Challenge):
+        return len(list(Player_Challenge.objects.filter(PCH_CH_ID_id=obj.id).all()))>0
 
     class Meta:
         model=Challenge
@@ -261,6 +268,9 @@ class CardSerializer(serializers.ModelSerializer):
         for i in range(0, min(len(to_sort),5)):
             ownerVal=to_sort[i]
             winner = Player.objects.filter(id=(-ownerVal)%(int(1e10))).values()[0]
+            prefCard=winner['prefCard_id']
+            winner.__delitem__('prefCard_id')
+            winner['prefCard']=prefCard
             topOwnersList.append(winner)
 
         return topOwnersList
@@ -275,6 +285,9 @@ class CardSerializer(serializers.ModelSerializer):
         for i in range(0, min(len(to_sort),5)):
             ownerVal=to_sort[i]
             winner = Player.objects.filter(id=(-ownerVal)%(int(1e10))).values()[0]
+            prefCard=winner['prefCard_id']
+            winner.__delitem__('prefCard_id')
+            winner['prefCard']=prefCard
             topOwnersPrefList.append(winner)
 
         return topOwnersPrefList
