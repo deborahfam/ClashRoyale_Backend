@@ -68,11 +68,11 @@ class ChallengeFilter(filters.FilterSet):
     ch_date= filters.DateFromToRangeFilter()
     ch_minLevel= filters.NumberFilter()
     ch_cost= filters.NumberFilter()
-    ch_masPrices=filters.NumberFilter()
+    ch_maxPrices=filters.NumberFilter()
 
     class Meta:
         model = Challenge
-        fields = ['ch_name','ch_description','ch_dueDate','ch_date', 'ch_minLevel', 'ch_cost', 'ch_masPrices']
+        fields = ['ch_name','ch_description','ch_dueDate','ch_date', 'ch_minLevel', 'ch_cost', 'ch_maxPrices']
 
     @property
     def qs(self):
