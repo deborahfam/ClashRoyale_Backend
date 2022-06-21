@@ -96,7 +96,6 @@ REST_FRAMEWORK = {
 }
 
 
-# FILTERS_DEFAULT_LOOKUP_EXPR='icontains'
 WSGI_APPLICATION = 'api_rest.wsgi.application'
 
 

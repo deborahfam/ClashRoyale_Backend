@@ -56,7 +56,7 @@ class Player(models.Model):
     nickname= models.CharField(max_length=20)
     prefCard= models.ForeignKey(
         'Card',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     P_gold= models.IntegerField()
     P_gems= models.IntegerField()
