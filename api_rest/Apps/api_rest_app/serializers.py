@@ -204,11 +204,7 @@ class WarSerializer(serializers.ModelSerializer):
     def get_participatingClans(self, obj : War):
         id=obj.id
         participatingListId=[ WG['P_G_ID_id'] for WG in list(Participate.objects.filter(P_W_ID=id).values())]
-        participatingList = []
-        for participatingId in participatingListId:
-            participatingList.append(Guild.objects.filter(id=participatingId).values()[0])
-
-        return participatingList
+        return Guild.objects.filter(id__in=participatingListId).values()
 
     class Meta:
         model=War
