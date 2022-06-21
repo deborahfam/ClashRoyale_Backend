@@ -57,6 +57,7 @@ class Player(models.Model):
     prefCard= models.ForeignKey(
         'Card',
         on_delete=models.SET_NULL,
+        null=True,
     )
     P_gold= models.IntegerField()
     P_gems= models.IntegerField()
