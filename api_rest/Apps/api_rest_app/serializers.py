@@ -95,7 +95,7 @@ class GuildSerializer(serializers.ModelSerializer):
             if cardId not in freqs.keys():
                 freqs[cardId]=0
 
-            card = list(Structure.objects.filter(id=cardId).values())
+            card = list(Structure.objects.filter(ST_ID=cardId).values())
 
             if len(card)==0:
                 continue
@@ -106,7 +106,12 @@ class GuildSerializer(serializers.ModelSerializer):
                 best_freq=freqs[cardId]
                 best_card=card[0]
 
-        best_card['timesPrefered']=freqs[best_card['id']]
+        if best_card==None:
+            return None
+        best_card['timesPrefered']=freqs[best_card['ST_ID_id']]
+        card_data=Card.objects.filter(id=best_card['ST_ID_id']).values()[0]
+        for key in card_data.keys():
+            best_card[key]=card_data[key]
         return best_card
         
     def get_bestTroopCard(self, obj : Guild):
@@ -126,7 +131,7 @@ class GuildSerializer(serializers.ModelSerializer):
             if cardId not in freqs.keys():
                 freqs[cardId]=0
 
-            card = list(Troop.objects.filter(id=cardId).values())
+            card = list(Troop.objects.filter(T_ID=cardId).values())
             
             if len(card)==0:
                 continue
@@ -137,7 +142,12 @@ class GuildSerializer(serializers.ModelSerializer):
                 best_freq=freqs[cardId]
                 best_card=card[0]
 
-        best_card['timesPrefered']=freqs[best_card['id']]
+        if best_card==None:
+            return None
+        best_card['timesPrefered']=freqs[best_card['T_ID_id']]
+        card_data=Card.objects.filter(id=best_card['T_ID_id']).values()[0]
+        for key in card_data.keys():
+            best_card[key]=card_data[key]
         return best_card
 
     def get_bestSpellCard(self, obj : Guild):
@@ -157,7 +167,7 @@ class GuildSerializer(serializers.ModelSerializer):
             if cardId not in freqs.keys():
                 freqs[cardId]=0
 
-            card = list(Spell.objects.filter(id=cardId).values())
+            card = list(Spell.objects.filter(SP_ID=cardId).values())
             
             if len(card)==0:
                 continue
@@ -168,7 +178,12 @@ class GuildSerializer(serializers.ModelSerializer):
                 best_freq=freqs[cardId]
                 best_card=card[0]
 
-        best_card['timesPrefered']=freqs[best_card['id']]
+        if best_card==None:
+            return None
+        best_card['timesPrefered']=freqs[best_card['SP_ID_id']]
+        card_data=Card.objects.filter(id=best_card['SP_ID_id']).values()[0]
+        for key in card_data.keys():
+            best_card[key]=card_data[key]
         return best_card
     
     def get_bestPlayers(self, obj : Guild):
